@@ -1,4 +1,12 @@
 project_docs
 knowledge_base
-back_end/configs/.env
 docs
+back_end/configs/.env
+back_end/.venv/
+back_end/logs/*.log
+front_end/node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.DS_Store
