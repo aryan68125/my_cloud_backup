@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file:
+      - ./back_end/configs/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  back_end:
+    build:
+      context: ./back_end
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./back_end/configs/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./back_end/logs:/app/logs
+
+  front_end:
+    build:
+      context: ./front_end
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_TARGET=http://back_end:8000
+    depends_on:
+      - back_end
+
+volumes:
+  postgres_data:
